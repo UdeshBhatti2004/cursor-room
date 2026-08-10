@@ -1,0 +1,50 @@
+
+# Name of the GitHub Actions workflow
+
+name: CI
+
+# When should this workflow run?
+on:
+  # Run whenever we push code
+   push:
+      # But only when pushing to the main branch
+       branches:
+         - main 
+
+# Jobs are the main tasks performed by this workflow
+jobs:
+
+    # Name of our job
+    test:
+ 
+    # GitHub provides an Ubuntu virtual machine (runner)
+       runs-on: ubuntu-latest
+
+     # Individual tasks performed by the runner
+       steps:
+     
+    # Step 1: Download/checkout our repository code
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+    # Step 2: Run a simple command to verify Actions is working
+        - name: Say hello
+          run: echo "Github action is working"
+
+
+
+# //// For my Understanding
+
+  #     WORKFLOW
+  #  │
+  #  ├── Trigger → When should it run?
+  #  │
+  #  └── Jobs
+  #       │
+  #       └── Job → What work should happen?
+  #            │
+  #            ├── Runner → Where does it run?
+  #            │
+  #            └── Steps
+  #                 ├── Checkout code
+  #                 └── Run commands
