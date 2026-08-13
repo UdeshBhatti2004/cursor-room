@@ -12,6 +12,10 @@ on:
       - completed
 
 
+permissions:
+   id-token: write
+   contents: read
+
 # Jobs performed by cd workflow
 
 jobs:
