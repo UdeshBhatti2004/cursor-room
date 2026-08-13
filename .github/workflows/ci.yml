@@ -34,7 +34,14 @@ jobs:
             node-version: 20
 
       # Step 3: Check Node.js version
-      
+        
+        - name: Check Node.js Version
+          run: node --version
+
+      # Step 4 : Install Dependencies
+        - name: Install client dependencies
+          run: npm install
+          working-directory: ./client
 
 
 
