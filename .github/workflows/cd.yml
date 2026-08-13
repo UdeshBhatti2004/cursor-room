@@ -38,3 +38,13 @@ jobs:
       #First step: Verify CD Started
       - name : CD started
         run : echo "CI completd. CD workflow started"
+
+       # Configure AWS authentication using GitHub OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+           role-to-assume: arn:aws:iam::872582135433:role/GitHubActions-CursorRoom-Deploy
+
+      # Verify AWS authentication
+      - name: Verify AWS authentication
+        run: aws sts get-caller-identity
