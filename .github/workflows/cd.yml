@@ -39,6 +39,12 @@ jobs:
       - name : CD started
         run : echo "CI completd. CD workflow started"
 
+           # Get GitHub repository IDs needed for the OIDC trust policy
+      - name: Show repository IDs
+        run: |
+          echo "Owner ID: ${{ github.repository_owner_id }}"
+          echo "Repository ID: ${{ github.repository_id }}"
+
        # Configure AWS authentication using GitHub OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -49,8 +55,4 @@ jobs:
       - name: Verify AWS authentication
         run: aws sts get-caller-identity
 
-              # Get GitHub repository IDs needed for the OIDC trust policy
-      - name: Show repository IDs
-        run: |
-          echo "Owner ID: ${{ github.repository_owner_id }}"
-          echo "Repository ID: ${{ github.repository_id }}"
+           
