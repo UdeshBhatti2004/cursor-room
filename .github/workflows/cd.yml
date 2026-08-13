@@ -16,6 +16,11 @@ on:
 
 jobs:
    deploy:
+
+   # Runs CD only when CI Succeeds
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+
      runs-on: ubuntu-latest
 
 
