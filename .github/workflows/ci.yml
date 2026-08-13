@@ -48,6 +48,12 @@ jobs:
           run: npm run build
           working-directory: ./client
 
+    # Step 6: Install dependenices in server
+        - name: Install Server Dependencies
+          run: npm install
+          working-directory: ./server
+          
+
 
 
 
