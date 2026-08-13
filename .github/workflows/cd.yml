@@ -48,3 +48,9 @@ jobs:
       # Verify AWS authentication
       - name: Verify AWS authentication
         run: aws sts get-caller-identity
+
+              # Get GitHub repository IDs needed for the OIDC trust policy
+      - name: Show repository IDs
+        run: |
+          echo "Owner ID: ${{ github.repository_owner_id }}"
+          echo "Repository ID: ${{ github.repository_id }}"
