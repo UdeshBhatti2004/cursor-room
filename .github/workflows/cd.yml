@@ -45,6 +45,13 @@ jobs:
           echo "Owner ID: ${{ github.repository_owner_id }}"
           echo "Repository ID: ${{ github.repository_id }}"
 
+    # fix: checkout commit before docker build
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
        # Configure AWS authentication using GitHub OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
