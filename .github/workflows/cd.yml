@@ -14,7 +14,7 @@ on:
 
 # Jobs performed by cd workflow
 
-Jobs:
+jobs:
    deploy:
      runs-on: ubuntu-latest
 
