@@ -70,4 +70,16 @@ jobs:
      # Building docker image
       - name: Build Docker image
         run: docker build -t cursor-room:${{ github.event.workflow_run.head_sha }} .
-           
+
+     # Tag docker image
+      - name: Tag Docker image
+        run: |
+          docker tag cursor-room:${{ github.event.workflow_run.head_sha }} \
+            ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
+      
+      # Push image to ECR
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push \
+            ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
