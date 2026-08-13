@@ -52,7 +52,11 @@ jobs:
         - name: Install Server Dependencies
           run: npm install
           working-directory: ./server
-          
+
+    # Step 7: Verify express server can be loaded
+        - name: Check Server
+          run: node --check src/index.js
+          working-directory: ./server
 
 
 
