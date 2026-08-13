@@ -1,0 +1,28 @@
+
+# Name of the github Acrtions and workflow
+
+name: CD
+   
+    # When should CD run workflow run ?
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+
+# Jobs performed by cd workflow
+
+Jobs:
+   deploy:
+     runs-on: ubuntu-latest
+
+
+  # Steps perfomed by the CD job
+     steps:
+
+    
+      #First step: Verify CD Started
+      - name : CD started
+        run : echo "CI completd. CD workflow started"
