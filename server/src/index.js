@@ -1,6 +1,5 @@
 import dns from 'node:dns';
 
-
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 import 'dotenv/config';
@@ -15,21 +14,34 @@ import authRoutes from './routes/authRoutes.js';
 import roomRoutes from './routes/roomRoutes.js';
 import { attachYjsWebSocketServer } from './ws/yjsServer.js';
 
+
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
+// Server port
+const PORT = process.env.PORT || 4000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Middleware
+app.use(cors({
+  origin: process.env.CLIENT_ORIGIN || '*'
+}));
+
 app.use(express.json());
 
-// Serve React frontend
-app.use(express.static('public'));
+app.use(
+  express.static(path.join(__dirname, '..', 'public'))
+);
 
-app.get("/api/health", (req, res) => {
-  console.log("===== HEALTH CHECK HIT =====");
+// Health check
+app.get('/api/health', (req, res) => {
+  console.log('===== HEALTH CHECK HIT =====');
 
   res.status(200).json({
     ok: true,
     port: PORT,
-    time: new Date().toISOString(),
+    time: new Date().toISOString()
   });
 });
 
@@ -37,19 +49,19 @@ app.get("/api/health", (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 
-// React Router fallback
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-app.get("/{*splat}", (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+app.use((req, res) => {
+  res.sendFile(
+    path.join(__dirname, '..', 'public', 'index.html')
+  );
 });
+
 
 const server = http.createServer(app);
 
+
 attachYjsWebSocketServer(server);
 
-const PORT = process.env.PORT || 4000;
 
 connectDB()
   .then(() => {
@@ -58,6 +70,10 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error("[server] failed to connect to MongoDB", err);
+    console.error(
+      '[server] failed to connect to MongoDB',
+      err
+    );
+
     process.exit(1);
   });
