@@ -30,11 +30,11 @@ jobs:
     # Steps performed by the CD job
     steps:
 
-      # First step: Verify CD started
+      # Verify CD started
       - name: CD started
         run: echo "CI completed. CD workflow started"
 
-      # Temporary step used to verify GitHub repository IDs
+      # Show GitHub repository IDs
       - name: Show repository IDs
         run: |
           echo "Owner ID: ${{ github.repository_owner_id }}"
@@ -51,6 +51,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::872582135433:role/GitHubActions-CursorRoom-Deploy
+          aws-region: ${{ env.AWS_REGION }}
 
       # Verify AWS authentication
       - name: Verify AWS authentication
@@ -81,6 +82,24 @@ jobs:
           docker push \
             ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
 
-      # Update ECS service to use the new Docker image
-      - name: Deploy To ECS 
+      # Render the ECS task definition
+      # This replaces the PLACEHOLDER image and injects the GitHub secrets.
+      - name: Render ECS task definition
+        id: render-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs-task-definition.json
+          container-name: cursor-room
+          image: ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
+          environment-variables: |
+            MONGO_URI=${{ secrets.MONGO_URI }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+
+      # Deploy the rendered task definition to ECS
+      - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true

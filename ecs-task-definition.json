@@ -1,0 +1,43 @@
+{
+  "family": "cursor-room-task",
+  "executionRoleArn": "arn:aws:iam::872582135433:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "containerDefinitions": [
+    {
+      "name": "cursor-room",
+      "image": "PLACEHOLDER",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 4000,
+          "hostPort": 4000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "CLIENT_ORIGIN",
+          "value": "http://cursor-room-alb-1274414078.ap-northeast-1.elb.amazonaws.com"
+        },
+        {
+          "name": "PORT",
+          "value": "4000"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cursor-room-task",
+          "awslogs-create-group": "true",
+          "awslogs-region": "ap-northeast-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}
