@@ -16,7 +16,7 @@ permissions:
 env:
   AWS_REGION: ap-northeast-1
   ECS_CLUSTER: cursor-room-cluster
-  ECS_SERVICE: cursor-room-service
+  ECS_SERVICE: cursor-room-task-service-spwcixsa
 
 # Jobs performed by CD workflow
 jobs:
