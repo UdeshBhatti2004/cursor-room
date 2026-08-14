@@ -80,3 +80,7 @@ jobs:
         run: |
           docker push \
             ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
+
+      # Update ECS service to use the new Docker image
+      - name: Deploy To ECS 
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
