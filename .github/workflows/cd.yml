@@ -96,6 +96,7 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
 
       # Deploy the rendered task definition to ECS
+      # Deploy Cursor Room to ECS
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
