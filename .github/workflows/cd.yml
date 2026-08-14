@@ -1,84 +1,79 @@
-
-# Name of the github Acrtions and workflow
-
+# Name of the GitHub Actions workflow
 name: CD
-   
-    # When should CD run workflow run ?
 
+# When should CD run?
 on:
   workflow_run:
     workflows: ["CI"]
     types:
       - completed
 
-
+# Permissions required for GitHub OIDC
 permissions:
-   id-token: write
-   contents: read
+  id-token: write
+  contents: read
 
 env:
- AWS_REGION: ap-northeast-1
+  AWS_REGION: ap-northeast-1
 
-# Jobs performed by cd workflow
-
+# Jobs performed by CD workflow
 jobs:
-   deploy:
+  deploy:
 
-   # Runs CD only when CI Succeeds
-     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # Run CD only when CI succeeds
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
+    runs-on: ubuntu-latest
 
-     runs-on: ubuntu-latest
+    # Steps performed by the CD job
+    steps:
 
+      # First step: Verify CD started
+      - name: CD started
+        run: echo "CI completed. CD workflow started"
 
-  # Steps perfomed by the CD job
-     steps:
-
-    
-      #First step: Verify CD Started
-      - name : CD started
-        run : echo "CI completd. CD workflow started"
-
-           # Get GitHub repository IDs needed for the OIDC trust policy
+      # Temporary step used to verify GitHub repository IDs
       - name: Show repository IDs
         run: |
           echo "Owner ID: ${{ github.repository_owner_id }}"
           echo "Repository ID: ${{ github.repository_id }}"
 
-    # fix: checkout commit before docker build
-
+      # Checkout the exact commit that triggered CI
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
-       # Configure AWS authentication using GitHub OIDC
+      # Configure AWS authentication using GitHub OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-           role-to-assume: arn:aws:iam::872582135433:role/GitHubActions-CursorRoom-Deploy
+          role-to-assume: arn:aws:iam::872582135433:role/GitHubActions-CursorRoom-Deploy
 
       # Verify AWS authentication
       - name: Verify AWS authentication
         run: aws sts get-caller-identity
 
-      # Login to amazon ECR
+      # Login to Amazon ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-     # Building docker image
+      # Build Docker image
+      # Pass the ALB API URL to Vite during the React build
       - name: Build Docker image
-        run: docker build -t cursor-room:${{ github.event.workflow_run.head_sha }} .
+        run: |
+          docker build \
+            --build-arg VITE_API_URL=http://cursor-room-alb-1274414078.ap-northeast-1.elb.amazonaws.com/api \
+            -t cursor-room:${{ github.event.workflow_run.head_sha }} .
 
-     # Tag docker image
+      # Tag Docker image for ECR
       - name: Tag Docker image
         run: |
           docker tag cursor-room:${{ github.event.workflow_run.head_sha }} \
             ${{ steps.login-ecr.outputs.registry }}/cursor-room:${{ github.event.workflow_run.head_sha }}
-      
-      # Push image to ECR
 
+      # Push Docker image to ECR
       - name: Push Docker image to ECR
         run: |
           docker push \
